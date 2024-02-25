@@ -4,7 +4,7 @@ import org.testng.annotations.Test;
 public class FirstTest {
 
     @Test
-    public void FirstTest(){
+    public void FirstTestMethod(){
         Assert.assertTrue(true);
     }
 }
