@@ -43,7 +43,7 @@ public class CalcTest extends BaseTest {
     }
 
     @Test(testName = "Division Int by Zero", expectedExceptions = ArithmeticException.class,
-            dependsOnMethods = "testIntDiv", groups = "Positive", priority = 3, alwaysRun = true)
+            dependsOnMethods = "testIntDiv", priority = 3, alwaysRun = true)
     public void testDivByZero() {
         calculator.div(10, 0);
     }
