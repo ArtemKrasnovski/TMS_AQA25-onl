@@ -1,64 +1,70 @@
-import data.StaticProvider;
+import data.DoubleDataProvider;
+import data.IntegerDataProvider;
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.beans.ExceptionListener;
-import java.util.List;
-import java.util.Random;
+public class CalcTest extends BaseTest {
 
-public class CalcTest extends BaseClassTest {
-    private int count = 0;
-
-    @BeforeMethod
-    public void beforeMethod() {
-        System.out.println("CalcTest started...");
+    @Test(testName = "Division of integer numbers", description = "Деление чисел типа Integer",
+            groups = "Positive", timeOut = 1000, priority = 1)
+    public void testIntDiv() throws InterruptedException {
+        Assert.assertEquals(calculator.div(6, 3), 2, "Неверный результат деления двух чисел");
+        Thread.sleep(900);
     }
 
-    @Test
-    public void testSum() {
-        Assert.assertEquals(calculator.sum(2, 3), 5, "Неверная сумма двух чисел");
-        //Assert.assertEquals(calculator.sum(2, 3), 5);
-        counter++;
+    @Test(testName = "Division of integer numbers_Negative", enabled = false, groups = "Negative")
+    public void testDisableIntDiv() {
+        Assert.assertEquals(calculator.div(10, 3), 5, "Неверный результат деления двух чисел");
     }
 
-    @Test(enabled = false)
-    public void testSum1() {
-        Assert.assertEquals(calculator.sum(2, 3), 5, "Неверная сумма двух чисел");
+    @Test(testName = "Division of integer numbers, DataProvider", dataProvider = "IntegerDataProvider",
+            dataProviderClass = IntegerDataProvider.class, invocationCount = 2, invocationTimeOut = 1000,
+            threadPoolSize = 2, groups = "Positive", dependsOnMethods = "testIntDiv", alwaysRun = true)
+    public void testIntDivDataProvider(int a, int b, int expectedResult) {
+        Assert.assertEquals(calculator.div(a, b), expectedResult, "Неверный результат деления двух чисел");
     }
 
-    @Test(description = "Тест с описанием")
-    public void testDescription() {
-        Assert.assertEquals(calculator.sum(2, 3), 5, "Неверная сумма двух чисел");
+    @Test(testName = "Division of double numbers", description = "Деление чисел типа Double",
+            groups = "Positive", timeOut = 1000, priority = 2)
+    public void testDoubleDiv() {
+        Assert.assertEquals(calculator.div(10.0, 8.0), 1.25, "Неверный результат деления двух чисел");
     }
 
-    @Test(testName = "Переименнованный тест")
-    public void testName() {
-        Assert.assertEquals(calculator.sum(2, 3), 5, "Неверная сумма двух чисел");
+    @Test(testName = "Division of double numbers_Negative", enabled = false, groups = "Negative")
+    public void testDisableDoubleDiv() {
+        Assert.assertEquals(calculator.div(20.0, 2.0), 5.0, "Неверный результат деления двух чисел");
     }
 
-    @Test(timeOut = 1000)
-    public void testTimeout() throws InterruptedException {
-        Thread.sleep(500);
+    @Test(testName = "Division of double numbers, DataProvider", dataProvider = "DoubleDataProvider",
+            dataProviderClass = DoubleDataProvider.class, invocationCount = 2, invocationTimeOut = 1000,
+            threadPoolSize = 2, groups = "Positive", dependsOnMethods = "testDoubleDiv")
+    public void testDoubleDivDataProvider(double a, double b, double expectedResult) {
+        Assert.assertEquals(calculator.div(a, b), expectedResult, "Неверный результат деления двух чисел");
     }
 
-    @Test(invocationCount = 3, threadPoolSize = 3, invocationTimeOut = 1000)
-    //@Test(invocationCount = 3, invocationTimeOut = 1000)
-    public void invocationCountTest() throws InterruptedException {
-        Thread.sleep(3000);
-        System.out.println(count++);
+    @Test(testName = "Division Int by Zero", expectedExceptions = ArithmeticException.class,
+            dependsOnMethods = "testIntDiv", groups = "Positive", priority = 3, alwaysRun = true)
+    public void testDivByZero() {
+        calculator.div(10, 0);
     }
 
-    @Test(dataProvider = "dataForSum", dataProviderClass = StaticProvider.class, threadPoolSize = 3)
-    public void testDataProvider(int a, int b, int expectedResult) throws InterruptedException {
-        //Thread.sleep(new Random().nextInt(1000));
-        Thread.sleep(500);
-        Assert.assertEquals(calculator.sum(a, b), expectedResult, "Неверная сумма двух чисел");
+    @Test(testName = "Division Double by Zero", priority = 4)
+    public void testDoubleDivByZero() {
+        Assert.assertEquals(Double.POSITIVE_INFINITY, calculator.div(20.50, 0), 0.0001);
     }
 
-    @Test(expectedExceptions = NullPointerException.class)
-    public void testExceptions() {
-        List list = null;
-        int size = list.size();
+    @Test(testName = "Division Double by Zero_Negative", priority = 5)
+    public void testNegativeDoubleDivByZero() {
+        Assert.assertEquals(Double.NEGATIVE_INFINITY, calculator.div(-10.50, 0), 0.0001);
+    }
+
+    @Test(testName = "Division Zero by Zero", priority = 6)
+    public void testNaN() {
+        Assert.assertEquals(Double.NaN, calculator.div(0.00, 0.00), 0.0001);
+    }
+
+    @Test(testName = "Test with retryAnalyzer", retryAnalyzer = Retry.class, priority = 7)
+    public void TestRetryAnalyzer() {
+        Assert.assertEquals(calculator.div(100, 25), 4);
     }
 }
